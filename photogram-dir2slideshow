@@ -25,7 +25,7 @@
 ##                available set of registered transitions.
 ##                
 ## Created at:    Fri Dec  5 17:25:34 2008
-## Modified at:   Fri Dec  5 17:26:01 2008
+## Modified at:   Fri Dec 12 18:00:36 2008
 ## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
 ######################################################################
 
@@ -37,6 +37,11 @@ import random
 from optparse import OptionParser
 
 from photogram import transitions
+
+def save_image(output_dir, img, frame_number):
+    outfilename = os.path.join(output_dir,'img%06d.png' % frame_number)
+    img.save(outfilename)
+    print 'Saved "%s" ' % outfilename
 
 def load_image(filename, size):
     if not filename:
@@ -71,9 +76,7 @@ def transition(file1, file2, output_dir, frame_number):
     print transition_name
     t = transitions.factories[transition_name].create_transition(initial_frame=img1, final_frame=img2, bgcolor=(0,0,0))
     for img in t.render(25):
-        outfilename = os.path.join(output_dir,'img%06d.png' % frame_number)
-        img.save(outfilename)
-        print 'Saved "%s" ' % outfilename
+        save_image(output_dir, img, frame_number)
         frame_number += 1
 
     return frame_number,img
@@ -95,8 +98,6 @@ if __name__=='__main__':
 
     (options, args) = parser.parse_args()
 
-    
-
     if (not options.input_directory) or (not options.output_directory):
         parser.print_help()
         sys.exit(1)
@@ -115,3 +116,6 @@ if __name__=='__main__':
     for i in range(len(image_files)-1):
         current_frame,img = transition(image_files[i],image_files[i+1],output_dir,current_frame)
         print 'Transition from "%s" to "%s" completed' % (image_files[i],image_files[i+1])
+        for j in range(25):
+            save_image(output_dir, img, current_frame)
+            frame_number += 1
