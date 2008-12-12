@@ -34,6 +34,7 @@ import sys
 import glob
 import os
 import random
+from optparse import OptionParser
 
 from photogram import transitions
 
@@ -79,8 +80,30 @@ def transition(file1, file2, output_dir, frame_number):
 
 if __name__=='__main__':
 
-    input_dir = sys.argv[1]
-    output_dir = sys.argv[2]
+
+    parser = OptionParser()
+
+    parser.add_option('--inputdir',
+                      type='string',
+                      dest='input_directory',
+                      help='Defines the directory with the photos to be used in the slideshow')
+
+    parser.add_option('--outputdir',
+                      type='string',
+                      dest='output_directory',
+                      help='Defines the directory where the .png frames should be saved')
+
+    (options, args) = parser.parse_args()
+
+    
+
+    if (not options.input_directory) or (not options.output_directory):
+        parser.print_help()
+        sys.exit(1)
+
+    input_dir = options.input_directory
+    output_dir = options.output_directory
+
 
     image_files = [None]+glob.glob(os.path.join(input_dir,'*.JPG'))+[None]
     current_frame = 0
