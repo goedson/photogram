@@ -106,6 +106,11 @@ if __name__=='__main__':
 
 
     image_files = [None]+glob.glob(os.path.join(input_dir,'*.JPG'))+[None]
+
+    if len(image_files) < 3:
+        sys.stderr.write('There are no image files in %s' % input_dir)
+        sys.exit(1)
+
     current_frame = 0
     for i in range(len(image_files)-1):
         current_frame,img = transition(image_files[i],image_files[i+1],output_dir,current_frame)
