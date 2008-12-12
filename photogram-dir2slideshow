@@ -101,8 +101,8 @@ if __name__=='__main__':
         parser.print_help()
         sys.exit(1)
 
-    input_dir = options.input_directory
-    output_dir = options.output_directory
+    input_dir = os.path.expanduser(options.input_directory)
+    output_dir = os.path.expanduser(options.output_directory)
 
 
     image_files = [None]+glob.glob(os.path.join(input_dir,'*.JPG'))+[None]
