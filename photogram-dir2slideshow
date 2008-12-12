@@ -1,0 +1,89 @@
+#!/usr/bin/python
+######################################################################
+##                
+## Copyright (C) 2008,  Goedson Teixeira Paixao
+##                
+## This program is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License
+## as published by the Free Software Foundation; either version 3
+## of the License, or (at your option) any later version.
+## 
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
+##                
+## Filename:      photogram-dir2slideshow
+## Author:        Goedson Teixeira Paixao <goedson@debian.org>
+## Description:   Converts a set of pictures contained in a directory
+##                into a slideshow using random transitions from the
+##                available set of registered transitions.
+##                
+## Created at:    Fri Dec  5 17:25:34 2008
+## Modified at:   Fri Dec  5 17:26:01 2008
+## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
+######################################################################
+
+import Image
+import sys
+import glob
+import os
+import random
+
+from photogram import transitions
+
+def load_image(filename, size):
+    if not filename:
+        return None
+    img = Image.new('RGB', size, (0,0,0))
+    if filename:
+        file_img = Image.open(filename)
+        img_size = file_img.size
+        x_ratio = 1.0*img_size[0]/size[0]
+        y_ratio = 1.0*img_size[1]/size[1]
+        if (x_ratio > y_ratio):
+            resize_factor = 1.0/x_ratio
+        else:
+            resize_factor = 1.0/y_ratio
+        new_size = (int(img_size[0] * resize_factor), int(img_size[1] * resize_factor))
+        resized_img = file_img.resize(new_size)
+        top_left = ((size[0] - new_size[0]) / 2, (size[1] - new_size[1])/2)
+        bottom_right = (top_left[0] + new_size[0], top_left[1] + new_size[1])
+        box = (top_left[0], top_left[1], bottom_right[0], bottom_right[1])
+        img.paste(resized_img, box)
+    return img
+
+def transition(file1, file2, output_dir, frame_number):
+    dvd_size = (720,576)
+    alpha=0.0
+    alpha_step = 1.0/25
+    img1 = load_image(file1, dvd_size)
+    img2 = load_image(file2, dvd_size)
+
+    transition_name = random.choice(transitions.factories.keys())
+
+    print transition_name
+    t = transitions.factories[transition_name].create_transition(initial_frame=img1, final_frame=img2, bgcolor=(0,0,0))
+    for img in t.render(25):
+        outfilename = os.path.join(output_dir,'img%06d.png' % frame_number)
+        img.save(outfilename)
+        print 'Saved "%s" ' % outfilename
+        frame_number += 1
+
+    return frame_number,img
+
+if __name__=='__main__':
+
+    input_dir = sys.argv[1]
+    output_dir = sys.argv[2]
+
+    image_files = [None]+glob.glob(os.path.join(input_dir,'*.JPG'))+[None]
+    current_frame = 0
+    for i in range(len(image_files)-1):
+        current_frame,img = transition(image_files[i],image_files[i+1],output_dir,current_frame)
+        print 'Transition from "%s" to "%s" completed' % (image_files[i],image_files[i+1])
