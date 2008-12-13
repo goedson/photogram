@@ -105,8 +105,16 @@ if __name__=='__main__':
     input_dir = os.path.expanduser(options.input_directory)
     output_dir = os.path.expanduser(options.output_directory)
 
-
-    image_files = [None]+glob.glob(os.path.join(input_dir,'*.JPG'))+[None]
+    # List all files contained in the input directory checking
+    # if they are valid images.
+    image_files = [None]
+    for filename in glob.glob(os.path.join(input_dir, '*')):
+        try:
+            img = Image.open(filename)
+            image_files.append(filename)
+        except:
+            pass
+    image_files.append(None)
 
     if len(image_files) < 3:
         sys.stderr.write('There are no image files in %s' % input_dir)
