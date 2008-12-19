@@ -22,7 +22,7 @@
 ## Description:   
 ##                
 ## Created at:    Thu Dec 18 16:59:33 2008
-## Modified at:   Thu Dec 18 22:33:37 2008
+## Modified at:   Fri Dec 19 10:08:39 2008
 ## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
 ######################################################################
 
@@ -47,15 +47,14 @@ class ImageLoader:
             else:
                 resize_factor = 1.0 / y_ratio
 
-                new_size = tuple([int(x * resize_factor) for x in image_size])
-                resized_image = file_image.resize(new_size)
-
-                top_left = ((self.size[0] - new_size[0]) / 2, (self.size[1]- new_size[1]) / 2)
-                bottom_right = (top_left[0] + new_size[0], top_left[1] + new_size[1])
-
-                box = (top_left[0],top_left[1], bottom_right[0], bottom_right[1])
-
-                image.paste(resized_image, box)
+            new_size = tuple([int(x * resize_factor) for x in image_size])
+            resized_image = file_image.resize(new_size)
+            
+            top_left = ((self.size[0] - new_size[0]) / 2, (self.size[1]- new_size[1]) / 2)
+            bottom_right = (top_left[0] + new_size[0], top_left[1] + new_size[1])
+            
+            box = (top_left[0],top_left[1], bottom_right[0], bottom_right[1])
+            image.paste(resized_image, box)
         return image
 
 
