@@ -25,7 +25,7 @@
 ##                available set of registered transitions.
 ##                
 ## Created at:    Fri Dec  5 17:25:34 2008
-## Modified at:   Thu Dec 18 22:27:30 2008
+## Modified at:   Thu Dec 18 22:31:46 2008
 ## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
 ######################################################################
 
@@ -37,39 +37,16 @@ import random
 from optparse import OptionParser
 
 from photogram import transitions
+from photogram.utility import ImageLoader
 
 def save_image(output_dir, img, frame_number):
     outfilename = os.path.join(output_dir,'img%06d.png' % frame_number)
     img.save(outfilename)
     print 'Saved "%s" ' % outfilename
 
-def load_image(filename, size):
-    if not filename:
-        return None
-    img = Image.new('RGB', size, (0,0,0))
-    if filename:
-        file_img = Image.open(filename)
-        img_size = file_img.size
-        x_ratio = 1.0*img_size[0]/size[0]
-        y_ratio = 1.0*img_size[1]/size[1]
-        if (x_ratio > y_ratio):
-            resize_factor = 1.0/x_ratio
-        else:
-            resize_factor = 1.0/y_ratio
-        new_size = (int(img_size[0] * resize_factor), int(img_size[1] * resize_factor))
-        resized_img = file_img.resize(new_size)
-        top_left = ((size[0] - new_size[0]) / 2, (size[1] - new_size[1])/2)
-        bottom_right = (top_left[0] + new_size[0], top_left[1] + new_size[1])
-        box = (top_left[0], top_left[1], bottom_right[0], bottom_right[1])
-        img.paste(resized_img, box)
-    return img
-
-def transition(file1, file2, output_dir, frame_number):
-    dvd_size = (720,576)
-    alpha=0.0
-    alpha_step = 1.0/25
-    img1 = load_image(file1, dvd_size)
-    img2 = load_image(file2, dvd_size)
+def transition(image_loader, file1, file2, output_dir, frame_number):
+    img1 = image_loader.load_image(file1)
+    img2 = image_loader.load_image(file2)
 
     transition_name = random.choice(transitions.factories.keys())
 
@@ -121,8 +98,14 @@ if __name__=='__main__':
         sys.exit(1)
 
     current_frame = 0
+
+    dvd_size = (720,576)
+    black=(0,0,0)
+
+    image_loader = ImageLoader(dvd_size, black)
+
     for i in range(len(image_files)-1):
-        current_frame,img = transition(image_files[i],image_files[i+1],output_dir,current_frame)
+        current_frame,img = transition(image_loader, image_files[i],image_files[i+1],output_dir,current_frame)
         print 'Transition from "%s" to "%s" completed' % (image_files[i],image_files[i+1])
         for j in range(25):
             save_image(output_dir, img, current_frame)
