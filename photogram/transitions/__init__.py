@@ -22,7 +22,7 @@
 ## Description:   
 ##                
 ## Created at:    Mon Dec  1 18:27:19 2008
-## Modified at:   Fri Dec  5 17:26:35 2008
+## Modified at:   Thu Dec 18 22:41:21 2008
 ## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
 ######################################################################
 import glob
@@ -43,20 +43,10 @@ class Transition:
         self.final_frame = final_frame
         self.bgcolor = bgcolor
 
-        print "----- Transition.__init__ ----"
-        print "initial_frame=%s" % self.initial_frame
-        print "final_frame=%s" % self.final_frame
-
         if not self.initial_frame:
             self.initial_frame = Image.new('RGB', self.final_frame.size, self.bgcolor)
         if not self.final_frame:
             self.final_frame = Image.new('RGB', self.initial_frame.size, self.bgcolor)
-        print "initial_frame=%s" % self.initial_frame
-        print "final_frame=%s" % self.final_frame
-
-        print "----------------------------------"
-
-
 
 factories = {}
 
