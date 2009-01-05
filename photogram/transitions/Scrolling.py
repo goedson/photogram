@@ -1,6 +1,6 @@
 ######################################################################
 ##                
-## Copyright (C) 2008,  Goedson Teixeira Paixao
+## Copyright (C) 2008-2009,  Goedson Teixeira Paixao
 ##                
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 ## Description:   
 ##                
 ## Created at:    Mon Dec  1 17:48:01 2008
-## Modified at:   Fri Dec  5 17:27:01 2008
+## Modified at:   Sun Jan  4 22:17:06 2009
 ## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
 ######################################################################
 
@@ -116,13 +116,7 @@ class Scrolling(Transition):
             region_y += region_y_step
 
 
-def create_slide_in_left(**params):
-    params['movement'] = 'enter'
-    params['direction'] = left
-    return Scrolling(**params)
-
 def create_slider(movement, direction):
-
     def creator_function(**params):
         params['movement'] = movement
         params['direction'] = direction
