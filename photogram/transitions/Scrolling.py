@@ -22,7 +22,7 @@
 ## Description:   
 ##                
 ## Created at:    Mon Dec  1 17:48:01 2008
-## Modified at:   Sun Jan  4 22:17:06 2009
+## Modified at:   Mon Jan  5 16:58:27 2009
 ## Modified by:   Goedson Teixeira Paixao <goedson@debian.org>
 ######################################################################
 
@@ -58,54 +58,102 @@ class Scrolling(Transition):
     def render(self, total_frames):
         img_width, img_height = self.initial_frame.size
 
-        img = self.initial_frame.copy()
+        if self.movement == 'enter':
+            bg_image = self.initial_frame.copy()
+            fg_image = self.final_frame.copy()
+        else:
+            bg_image = self.final_frame.copy()
+            fg_image = self.initial_frame.copy()
 
         width_step = (img_width / total_frames) * abs(self.direction.xdelta)
         height_step = (img_height / total_frames) * abs(self.direction.ydelta)
 
-        if width_step != 0:
-            region_width = width_step + (img_width % total_frames)
-        else:
-            region_width = img_width
+        if self.movement == 'enter':
+            if width_step != 0:
+                region_width = width_step + (img_width % total_frames)
+            else:
+                region_width = img_width
 
-        if height_step != 0:
-            region_height = height_step + (img_height % total_frames)
-        else:
-            region_height = img_height
+            if height_step != 0:
+                region_height = height_step + (img_height % total_frames)
+            else:
+                region_height = img_height
 
-        if self.direction.xdelta > 0:
-            region_x = img_width - region_width
-            region_x_step = -width_step
-        else:
-            region_x = 0
-            region_x_step = 0
+            if self.direction.xdelta > 0:
+                region_x = img_width - region_width
+                region_x_step = -width_step
+            else:
+                region_x = 0
+                region_x_step = 0
 
-        if self.direction.ydelta > 0:
-            region_y = img_height - region_height
-            region_y_step = -height_step
-        else:
-            region_y = 0
-            region_y_step = 0
+            if self.direction.ydelta > 0:
+                region_y = img_height - region_height
+                region_y_step = -height_step
+            else:
+                region_y = 0
+                region_y_step = 0
 
-        if self.direction.xdelta < 0:
-            paste_x = img_width - region_width
-            paste_x_step = -width_step
-        else:
-            paste_x = 0
-            paste_x_step = 0
+            if self.direction.xdelta < 0:
+                paste_x = img_width - region_width
+                paste_x_step = -width_step
+            else:
+                paste_x = 0
+                paste_x_step = 0
 
 
-        if self.direction.ydelta < 0:
-            paste_y = img_height - region_height
-            paste_y_step = -height_step
-        else:
-            paste_y = 0
-            paste_y_step = 0
+            if self.direction.ydelta < 0:
+                paste_y = img_height - region_height
+                paste_y_step = -height_step
+            else:
+                paste_y = 0
+                paste_y_step = 0
+        else: #if movement == 'exit'
+            width_step = -width_step
+            height_step = -height_step
+
+            if width_step != 0:
+                region_width = img_width - (abs(width_step) + (img_width % total_frames))
+            else:
+                region_width = img_width
+            if height_step != 0:
+                region_height = img_height - (abs(height_step) + (img_height % total_frames))
+            else:
+                region_height = img_height
+
+            if self.direction.xdelta > 0:
+                region_x = img_width - region_width
+                region_x_step = -width_step
+            else:
+                region_x = 0
+                region_x_step = 0
+
+            if self.direction.ydelta > 0:
+                region_y = img_height - region_height
+                region_y_step = -height_step
+            else:
+                region_y = 0
+                region_y_step = 0
+
+            if self.direction.xdelta < 0:
+                paste_x = img_width - region_width
+                paste_x_step = -width_step
+            else:
+                paste_x = 0
+                paste_x_step = 0
+
+
+            if self.direction.ydelta < 0:
+                paste_y = img_height - region_height
+                paste_y_step = -height_step
+            else:
+                paste_y = 0
+                paste_y_step = 0
 
         for frame in xrange(total_frames):
             crop_region = (region_x, region_y, region_x + region_width, region_y + region_height)
             paste_region = (paste_x, paste_y, paste_x + region_width, paste_y + region_height)
-            croped_img = self.final_frame.crop(crop_region)
+            croped_img = fg_image.crop(crop_region)
+            img = bg_image.copy()
             img.paste(croped_img, paste_region)
             yield img
             region_width += width_step
@@ -131,4 +179,13 @@ register_transition('Enter from topleft', TransitionFactory('Enter from topleft'
 register_transition('Enter from topright', TransitionFactory('Enter from topright', create_slider('enter', top_right)))
 register_transition('Enter from bottomleft', TransitionFactory('Enter from bottomleft', create_slider('enter', bottom_left)))
 register_transition('Enter from bottomright', TransitionFactory('Enter from bottomright', create_slider('enter', bottom_right)))
+
+register_transition('Exit to left', TransitionFactory('Exit to left', create_slider('exit', left)))
+register_transition('Exit to right', TransitionFactory('Exit to right', create_slider('exit', right)))
+register_transition('Exit to top', TransitionFactory('Exit to top', create_slider('exit', top)))
+register_transition('Exit to bottom', TransitionFactory('Exit to bottom', create_slider('exit', bottom)))
+register_transition('Exit to topleft', TransitionFactory('Exit to topleft', create_slider('exit', top_left)))
+register_transition('Exit to topright', TransitionFactory('Exit to topright', create_slider('exit', top_right)))
+register_transition('Exit to bottomleft', TransitionFactory('Exit to bottomleft', create_slider('exit', bottom_left)))
+register_transition('Exit to bottomright', TransitionFactory('Exit to bottomright', create_slider('exit', bottom_right)))
 
